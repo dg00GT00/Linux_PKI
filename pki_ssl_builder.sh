@@ -176,7 +176,7 @@ distinguished_name  = req_distinguished_name
 string_mask   = utf8only
 default_md   =  sha256
 # Extension to add when the -x509 option is used.
-x509_extensions   = v3_ca
+x509_extensions   = v3_intermediate_ca
 
 [ req_distinguished_name ]
 countryName                     = Country Name (2 letter code)
