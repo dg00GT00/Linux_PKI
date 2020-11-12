@@ -239,7 +239,7 @@ openssl rand -hex 16 > $ca_dir/sub-ca/crlnumber
 
 printf "CREATING THE CA PRIVATE KEY - PASS-PHRASE NEEDED...\n\n"
 
-openssl genrsa -aes256 -out $ca_dir/root-ca/private/ca.key 4096
+openssl genrsa -aes256 -out $ca_dir/root-ca/private/ca.key 4096 
 
 printf "CREATING THE SUB-CA PRIVATE KEY - PASS-PHRASE NEEDED...\n\n"
 
@@ -270,8 +270,12 @@ openssl req -key $ca_dir/server/private/server.key -new -sha256 -out $ca_dir/ser
 
 printf "CREATING SERVER CERTIFICATE SIGNED BY SUB-CA...\n\n"
 
-openssl ca -config $sub_ca_config_path --extensions server_cert -days 365 -notext -in $ca_dir/server/csr/server.csr \
+openssl ca -config $sub_ca_config_path -extensions server_cert -days 365 -notext -in $ca_dir/server/csr/server.csr \
 -out $ca_dir/server/certs/server.crt
+
+printf "CREATING SERVER CRL...\n\n"
+
+openssl ca -config $sub_ca_config_path -gencrl -out $ca_dir/server/crl/server.crl -crlexts crl_ext
 
 # Testing the server certificate
 # openssl s_server -accept 443 -www -key $ca_dir/server/private/server.key -cert $ca_dir/server/certs/server.crt -CAfile $ca_dir/sub-ca/certs/sub-ca.crt
