@@ -232,6 +232,11 @@ printf "CREATING SERIAL NUMBERS...\n\n"
 openssl rand -hex 16 > $ca_dir/root-ca/serial
 openssl rand -hex 16 > $ca_dir/sub-ca/serial
 
+printf "CREATED CRL NUMBERS\n\n"
+
+openssl rand -hex 16 > $ca_dir/root-ca/crlnumber
+openssl rand -hex 16 > $ca_dir/sub-ca/crlnumber
+
 printf "CREATING THE CA PRIVATE KEY - PASS-PHRASE NEEDED...\n\n"
 
 openssl genrsa -aes256 -out $ca_dir/root-ca/private/ca.key 4096
