@@ -223,11 +223,11 @@ printf "TURNING THE PRIVATE DIRECTORIES PRIVATE...\n\n"
 
 chmod -v 700 $ca_dir/{root-ca,sub-ca,server}/private
 
-printf "CREATING THE INDEX FILE...\n\n"
+printf "CREATED THE INDEX FILE\n\n"
 
 touch $ca_dir/{root-ca,sub-ca}/index
 
-printf "CREATING SERIAL NUMBERS...\n\n"
+printf "CREATED SERIAL NUMBERS\n\n"
 
 openssl rand -hex 16 > $ca_dir/root-ca/serial
 openssl rand -hex 16 > $ca_dir/sub-ca/serial
@@ -264,7 +264,7 @@ openssl ca -config $root_ca_config_path -extensions v3_intermediate_ca -days 365
 -out $ca_dir/sub-ca/certs/sub-ca.crt
 
 # Server certificates
-printf "CREATING SERVER SIGNIN REQUEST...\n\n (WARNING: Comman Name field is required)"
+printf "CREATING SERVER SIGNING REQUEST...(WARNING: Comman Name field is required) \n\n"
 
 openssl req -key $ca_dir/server/private/server.key -new -sha256 -out $ca_dir/server/csr/server.csr
 
