@@ -49,7 +49,7 @@ default_days   = 365
 preserve   = no
 policy    = policy_strict
 
-[ clr_ext ]
+[ crl_ext ]
 authorityKeyIdentifier = keyid:always,issuer:always
 
 [ policy_strict ]
@@ -149,7 +149,7 @@ default_days   = 365
 preserve   = no
 policy    = policy_loose
 
-[ clr_ext ]
+[ crl_ext ]
 authorityKeyIdentifier = keyid:always,issuer:always
 
 [ policy_strict ]
