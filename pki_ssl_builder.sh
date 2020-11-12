@@ -49,6 +49,9 @@ default_days   = 365
 preserve   = no
 policy    = policy_strict
 
+[ clr_ext ]
+authorityKeyIdentifier = keyid:always,issuer:always
+
 [ policy_strict ]
 countryName   = supplied
 stateOrProvinceName  =  supplied
@@ -146,6 +149,9 @@ default_days   = 365
 preserve   = no
 policy    = policy_loose
 
+[ clr_ext ]
+authorityKeyIdentifier = keyid:always,issuer:always
+
 [ policy_strict ]
 countryName   = supplied
 stateOrProvinceName  =  supplied
@@ -208,8 +214,9 @@ nsCertType   = server
 nsComment   =  "OpenSSL Generated Server Certificate"
 subjectKeyIdentifier  = hash
 authorityKeyIdentifier  = keyid,issuer:always
-keyUsage   =  critical, digitalSignature, keyEncipherment
+keyUsage   =  critical, digitalSignature, keyEncipherment, cRLSign
 extendedKeyUsage  = serverAuth
+crlDistributionPoints = URI:http://localhost:443/crl/server.crl
 EOF
 
 printf "TURNING THE PRIVATE DIRECTORIES PRIVATE...\n\n"
@@ -262,4 +269,4 @@ openssl ca -config $sub_ca_config_path --extensions server_cert -days 365 -notex
 -out $ca_dir/server/certs/server.crt
 
 # Testing the server certificate
-openssl s_server -accept 443 -www -key $ca_dir/server/private/server.key -cert $ca_dir/server/certs/server.crt -CAfile $ca_dir/sub-ca/certs/sub-ca.crt
+# openssl s_server -accept 443 -www -key $ca_dir/server/private/server.key -cert $ca_dir/server/certs/server.crt -CAfile $ca_dir/sub-ca/certs/sub-ca.crt
