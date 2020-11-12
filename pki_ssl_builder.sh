@@ -206,6 +206,7 @@ authorityKeyIdentifier  = keyid:always,issuer
 #pathlen:0 ensures no more sub-ca can be created below an intermediate
 basicConstraints  = critical, CA:true, pathlen:0
 keyUsage   = critical, digitalSignature, cRLSign, keyCertSign
+crlDistributionPoints = URI:http://localhost:443/crl/server.crl
 
 [ server_cert ]
 # Extensions for server certificates
@@ -214,9 +215,8 @@ nsCertType   = server
 nsComment   =  "OpenSSL Generated Server Certificate"
 subjectKeyIdentifier  = hash
 authorityKeyIdentifier  = keyid,issuer:always
-keyUsage   =  critical, digitalSignature, keyEncipherment, cRLSign
+keyUsage   =  critical, digitalSignature, keyEncipherment
 extendedKeyUsage  = serverAuth
-crlDistributionPoints = URI:http://localhost:443/crl/server.crl
 EOF
 
 printf "TURNING THE PRIVATE DIRECTORIES PRIVATE...\n\n"
