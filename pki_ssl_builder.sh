@@ -12,9 +12,10 @@ END_OF_DOCS
 ca_dir=$HOME/CA
 cn="ElectricStone CA" # Fictional CommonName
 
-printf "CREATING PKI DIRECTORIES...\n\n"
+printf "CREATED PKI DIRECTORIES\n\n"
 
 mkdir -p $ca_dir/{root-ca,sub-ca,server}/{private,certs,newcerts,crl,csr}
+mkdir $ca_dir/ca-chain
 
 root_ca_config_path=$ca_dir/root-ca/root-ca.conf
 sub_ca_config_path=$ca_dir/sub-ca/sub-ca.conf
@@ -269,6 +270,12 @@ printf "CREATING A SUB-CA CERTIFICATE...\n\n"
 
 openssl ca -config $root_ca_config_path -extensions v3_intermediate_ca -days 3650 -notext -in $ca_dir/sub-ca/csr/sub-ca.csr \
 -out $ca_dir/sub-ca/certs/sub-ca.crt
+
+# Chained certificates
+
+printf "\n\nCREATING A CERTIFICATE CHAIN...\n\n"
+
+cat $ca_dir/sub-ca/certs/sub-ca.crt $ca_dir/root-ca/certs/ca.crt > $ca_dir/ca-chain/ca-chain.crt
 
 # Server certificates
 printf "CREATING SERVER SIGNING REQUEST...(WARNING: Comman Name field is required) \n\n"
