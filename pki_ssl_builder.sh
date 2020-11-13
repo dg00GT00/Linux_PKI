@@ -10,6 +10,7 @@ The Intermediate CA can be online but often not on the samesystem as other serve
 END_OF_DOCS
 
 ca_dir=$HOME/CA
+cn="ElectricStone CA" # Fictional CommonName
 
 printf "CREATING PKI DIRECTORIES...\n\n"
 
@@ -84,7 +85,7 @@ stateOrProvinceName             = State or Province Name
 localityName                    = Locality Name
 0.organizationName              = Organization Name
 organizationalUnitName          = Organizational Unit Name
-commonName                      = RootCA
+commonName                      = $cn
 emailAddress                    = Email Address
 countryName_default  = BR
 stateOrProvinceName_default = Brazil
@@ -184,7 +185,7 @@ stateOrProvinceName             = State or Province Name
 localityName                    = Locality Name
 0.organizationName              = Organization Name
 organizationalUnitName          = Organizational Unit Name
-commonName                      = SubCA
+commonName                      = $cn
 emailAddress                    = Email Address
 countryName_default  = BR
 stateOrProvinceName_default = Brazil
@@ -206,7 +207,7 @@ authorityKeyIdentifier  = keyid:always,issuer
 #pathlen:0 ensures no more sub-ca can be created below an intermediate
 basicConstraints  = critical, CA:true, pathlen:0
 keyUsage   = critical, digitalSignature, cRLSign, keyCertSign
-crlDistributionPoints = URI:http://localhost:443/crl/server.crl
+crlDistributionPoints = URI:http://localhost:5002/crl/server.crl
 
 [ server_cert ]
 # Extensions for server certificates
@@ -217,6 +218,12 @@ subjectKeyIdentifier  = hash
 authorityKeyIdentifier  = keyid,issuer:always
 keyUsage   =  critical, digitalSignature, keyEncipherment
 extendedKeyUsage  = serverAuth
+subjectAltName = @alt_names
+
+[ alt_names ]
+# Be sure to include the domain name here because Common Name is not so commonly honoured by itself
+DNS.1 = localhost 
+IP.1 = 127.0.0.1
 EOF
 
 printf "TURNING THE PRIVATE DIRECTORIES PRIVATE...\n\n"
