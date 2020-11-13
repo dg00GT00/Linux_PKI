@@ -227,46 +227,46 @@ DNS.1 = localhost
 IP.1 = 127.0.0.1
 EOF
 
-printf "TURNING THE PRIVATE DIRECTORIES PRIVATE...\n\n"
+printf "\n\nTURNING THE PRIVATE DIRECTORIES PRIVATE...\n\n"
 
 chmod -v 700 $ca_dir/{root-ca,sub-ca,server}/private
 
-printf "CREATED THE INDEX FILE\n\n"
+printf "\n\nCREATED THE INDEX FILE\n\n"
 
 touch $ca_dir/{root-ca,sub-ca}/index
 
-printf "CREATED SERIAL NUMBERS\n\n"
+printf "\n\nCREATED SERIAL NUMBERS\n\n"
 
 openssl rand -hex 16 > $ca_dir/root-ca/serial
 openssl rand -hex 16 > $ca_dir/sub-ca/serial
 
-printf "CREATED CRL NUMBERS\n\n"
+printf "\n\nCREATED CRL NUMBERS\n\n"
 
 openssl rand -hex 16 > $ca_dir/root-ca/crlnumber
 openssl rand -hex 16 > $ca_dir/sub-ca/crlnumber
 
-printf "CREATING THE CA PRIVATE KEY - PASS-PHRASE NEEDED...\n\n"
+printf "\n\nCREATING THE CA PRIVATE KEY - PASS-PHRASE NEEDED...\n\n"
 
 openssl genrsa -aes256 -out $ca_dir/root-ca/private/ca.key 4096 
 
-printf "CREATING THE SUB-CA PRIVATE KEY - PASS-PHRASE NEEDED...\n\n"
+printf "\n\nCREATING THE SUB-CA PRIVATE KEY - PASS-PHRASE NEEDED...\n\n"
 
 openssl genrsa -aes256 -out $ca_dir/sub-ca/private/sub-ca.key 4096
 
-printf "CREATING THE SERVER PRIVATE KEY...\n\n"
+printf "\n\nCREATING THE SERVER PRIVATE KEY...\n\n"
 
 openssl genrsa -out $ca_dir/server/private/server.key 2048
 
-printf "CREATING THE CA CERTIFICATE... (WARNING: Fullfil the 'RootCA' field even though it already have a default value)\n\n"
+printf "\n\nCREATING THE CA CERTIFICATE... (WARNING: Fullfil the 'CommonName' field even though it already have a default value)\n\n"
 
 openssl req -config $root_ca_config_path -key $ca_dir/root-ca/private/ca.key -new -x509 -days 7500 \
 -sha256 -extensions v3_ca -out $ca_dir/root-ca/certs/ca.crt
 
-printf "CREATING A SUB-CA REQUEST SIGNIN.. (WARNING: Fullfil the 'SubCA' field even though it already have a default value) \n\n"
+printf "\n\nCREATING A SUB-CA REQUEST SIGNIN.. (WARNING: Fullfil the 'CommonName' field even though it already have a default value) \n\n"
 
 openssl req -config $sub_ca_config_path -new -key $ca_dir/sub-ca/private/sub-ca.key -sha256 -out $ca_dir/sub-ca/csr/sub-ca.csr
 
-printf "CREATING A SUB-CA CERTIFICATE...\n\n"
+printf "\n\nCREATING A SUB-CA CERTIFICATE...\n\n"
 
 openssl ca -config $root_ca_config_path -extensions v3_intermediate_ca -days 3650 -notext -in $ca_dir/sub-ca/csr/sub-ca.csr \
 -out $ca_dir/sub-ca/certs/sub-ca.crt
@@ -278,16 +278,16 @@ printf "\n\nCREATING A CERTIFICATE CHAIN...\n\n"
 cat $ca_dir/sub-ca/certs/sub-ca.crt $ca_dir/root-ca/certs/ca.crt > $ca_dir/ca-chain/ca-chain.crt
 
 # Server certificates
-printf "CREATING SERVER SIGNING REQUEST...(WARNING: Comman Name field is required) \n\n"
+printf "\n\nCREATING SERVER SIGNING REQUEST...(WARNING: Comman Name field is required) \n\n"
 
 openssl req -key $ca_dir/server/private/server.key -new -sha256 -out $ca_dir/server/csr/server.csr
 
-printf "CREATING SERVER CERTIFICATE SIGNED BY SUB-CA...\n\n"
+printf "\n\nCREATING SERVER CERTIFICATE SIGNED BY SUB-CA...\n\n"
 
 openssl ca -config $sub_ca_config_path -extensions server_cert -days 365 -notext -in $ca_dir/server/csr/server.csr \
 -out $ca_dir/server/certs/server.crt
 
-printf "CREATING SERVER CRL...\n\n"
+printf "\n\nCREATING SERVER CRL...\n\n"
 
 openssl ca -config $sub_ca_config_path -gencrl -out $ca_dir/server/crl/server.crl -crlexts crl_ext
 
