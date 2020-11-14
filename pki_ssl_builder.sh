@@ -195,31 +195,31 @@ DNS.1 = localhost
 IP.1 = 127.0.0.1
 EOF
 
-printf "\n\nTURNING THE PRIVATE DIRECTORIES PRIVATE...\n\n"
+printf "TURNING THE PRIVATE DIRECTORIES PRIVATE...\n"
 
 chmod -v 700 $ca_dir/{root-ca,sub-ca,server}/private
 
-printf "\n\nCREATED THE INDEX FILE\n\n"
+printf "CREATED THE INDEX FILE\n\n"
 
 touch $ca_dir/{root-ca,sub-ca}/index
 
-printf "\n\nCREATED SERIAL NUMBERS\n\n"
+printf "CREATED SERIAL NUMBERS\n\n"
 
 openssl rand -hex 16 > $ca_dir/root-ca/serial
 openssl rand -hex 16 > $ca_dir/sub-ca/serial
 
-printf "\n\nCREATED CRL NUMBERS\n\n"
+printf "CREATED CRL NUMBERS\n\n"
 
 openssl rand -hex 16 > $ca_dir/root-ca/crlnumber
 openssl rand -hex 16 > $ca_dir/sub-ca/crlnumber
 
-printf "\n\nCREATING THE CA PRIVATE KEY - PASS-PHRASE NEEDED...\n\n"
+printf "CREATING THE CA PRIVATE KEY - PASS-PHRASE NEEDED...\n\n"
 
-openssl genrsa -aes256 -out $ca_dir/root-ca/private/ca.key 4096 
+openssl genrsa -aes256 -passout file:$pass -out $ca_dir/root-ca/private/ca.key 4096 
 
 printf "\n\nCREATING THE SUB-CA PRIVATE KEY - PASS-PHRASE NEEDED...\n\n"
 
-openssl genrsa -aes256 -out $ca_dir/sub-ca/private/sub-ca.key 4096
+openssl genrsa -aes256 -passout file:$pass -out $ca_dir/sub-ca/private/sub-ca.key 4096
 
 printf "\n\nCREATING THE SERVER PRIVATE KEY...\n\n"
 
@@ -227,16 +227,16 @@ openssl genrsa -out $ca_dir/server/private/server.key 2048
 
 printf "\n\nCREATING THE CA CERTIFICATE... (WARNING: Fullfil the 'CommonName' field even though it already have a default value)\n\n"
 
-openssl req -config $root_ca_config_path -key $ca_dir/root-ca/private/ca.key -new -x509 -days 7500 \
+openssl req -config $root_ca_config_path -passin file:$pass -key $ca_dir/root-ca/private/ca.key -new -x509 -days 7500 \
 -sha256 -extensions v3_ca -out $ca_dir/root-ca/certs/ca.crt
 
-printf "\n\nCREATING A SUB-CA REQUEST SIGNIN.. (WARNING: Fullfil the 'CommonName' field even though it already have a default value) \n\n"
+printf "\n\nCREATING A SUB-CA SIGNING REQUEST... (WARNING: Fullfil the 'CommonName' field even though it already have a default value) \n\n"
 
-openssl req -config $sub_ca_config_path -new -key $ca_dir/sub-ca/private/sub-ca.key -sha256 -out $ca_dir/sub-ca/csr/sub-ca.csr
+openssl req -config $sub_ca_config_path -passin file:$pass -new -key $ca_dir/sub-ca/private/sub-ca.key -sha256 -out $ca_dir/sub-ca/csr/sub-ca.csr
 
 printf "\n\nCREATING A SUB-CA CERTIFICATE...\n\n"
 
-openssl ca -config $root_ca_config_path -extensions v3_intermediate_ca -days 3650 -notext -in $ca_dir/sub-ca/csr/sub-ca.csr \
+openssl ca -config $root_ca_config_path -passin file:$pass -extensions v3_intermediate_ca -days 3650 -notext -in $ca_dir/sub-ca/csr/sub-ca.csr \
 -out $ca_dir/sub-ca/certs/sub-ca.crt
 
 # Chained certificates
@@ -246,18 +246,19 @@ printf "\n\nCREATING A CERTIFICATE CHAIN...\n\n"
 cat $ca_dir/sub-ca/certs/sub-ca.crt $ca_dir/root-ca/certs/ca.crt > $ca_dir/ca-chain/ca-chain.crt
 
 # Server certificates
-printf "\n\nCREATING SERVER SIGNING REQUEST...(WARNING: Comman Name field is required) \n\n"
 
-openssl req -key $ca_dir/server/private/server.key -new -sha256 -out $ca_dir/server/csr/server.csr
+printf "\n\nCREATING SERVER SIGNING REQUEST...(WARNING: Common Name field is required) \n\n"
+
+openssl req -passin file:$pass -key $ca_dir/server/private/server.key -new -sha256 -out $ca_dir/server/csr/server.csr
 
 printf "\n\nCREATING SERVER CERTIFICATE SIGNED BY SUB-CA...\n\n"
 
-openssl ca -config $sub_ca_config_path -extensions server_cert -days 365 -notext -in $ca_dir/server/csr/server.csr \
+openssl ca -passin file:$pass -config $sub_ca_config_path -extensions server_cert -days 365 -notext -in $ca_dir/server/csr/server.csr \
 -out $ca_dir/server/certs/server.crt
 
 printf "\n\nCREATING SERVER CRL...\n\n"
 
-openssl ca -config $sub_ca_config_path -gencrl -out $ca_dir/server/crl/server.crl -crlexts crl_ext
+openssl ca -passin file:$pass -config $sub_ca_config_path -gencrl -out $ca_dir/server/crl/server.crl -crlexts crl_ext
 
 # Testing the server certificate
-# openssl s_server -accept 443 -www -key $ca_dir/server/private/server.key -cert $ca_dir/server/certs/server.crt -CAfile $ca_dir/sub-ca/certs/sub-ca.crt
+sudo openssl s_server -accept 443 -www -key $ca_dir/server/private/server.key -cert $ca_dir/server/certs/server.crt -CAfile $ca_dir/sub-ca/certs/sub-ca.crt
