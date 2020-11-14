@@ -59,21 +59,12 @@ policy    = policy_strict
 authorityKeyIdentifier = keyid:always,issuer:always
 
 [ policy_strict ]
-countryName   = supplied
+countryName   = match
 stateOrProvinceName  =  supplied
 organizationName  = match
 organizationalUnitName  =  optional
 commonName   =  supplied
 emailAddress   =  optional
-
-[ policy_loose ]
-countryName   = optional
-stateOrProvinceName  = optional
-localityName   = optional
-organizationName  = optional
-organizationalUnitName   = optional
-commonName   = supplied
-emailAddress   = optional
 
 [ req ]
 # Options for the req tool, man req.
@@ -90,7 +81,7 @@ stateOrProvinceName             = State or Province Name
 localityName                    = Locality Name
 0.organizationName              = Organization Name
 organizationalUnitName          = Organizational Unit Name
-commonName                      = $cn
+commonName                      = ElectricStone Root CA
 emailAddress                    = Email Address
 countryName_default  = BR
 stateOrProvinceName_default = Brazil
@@ -112,16 +103,6 @@ authorityKeyIdentifier  = keyid:always,issuer
 #pathlen:0 ensures no more sub-ca can be created below an intermediate
 basicConstraints  = critical, CA:true, pathlen:0
 keyUsage   = critical, digitalSignature, cRLSign, keyCertSign
-
-[ server_cert ]
-# Extensions for server certificates
-basicConstraints  = CA:FALSE
-nsCertType   = server
-nsComment   =  "OpenSSL Generated Server Certificate"
-subjectKeyIdentifier  = hash
-authorityKeyIdentifier  = keyid,issuer:always
-keyUsage   =  critical, digitalSignature, keyEncipherment
-extendedKeyUsage  = serverAuth
 EOF
 
 cat << EOF > $sub_ca_config_path
@@ -153,27 +134,18 @@ name_opt   = ca_default
 cert_opt   = ca_default
 default_days   = 365
 preserve   = no
-policy    = policy_loose
+policy    = policy_strict
 
 [ crl_ext ]
 authorityKeyIdentifier = keyid:always,issuer:always
 
 [ policy_strict ]
-countryName   = supplied
+countryName   = match
 stateOrProvinceName  =  supplied
 organizationName  = match
 organizationalUnitName  =  optional
 commonName   =  supplied
 emailAddress   =  optional
-
-[ policy_loose ]
-countryName   = optional
-stateOrProvinceName  = optional
-localityName   = optional
-organizationName  = optional
-organizationalUnitName   = optional
-commonName   = supplied
-emailAddress   = optional
 
 [ req ]
 # Options for the req tool, man req.
@@ -185,24 +157,16 @@ default_md   =  sha256
 x509_extensions   = v3_intermediate_ca
 
 [ req_distinguished_name ]
-countryName                     = Country Name (2 letter code)
+countryName                     = BR
 stateOrProvinceName             = State or Province Name
 localityName                    = Locality Name
-0.organizationName              = Organization Name
+0.organizationName              = ElectricStone Ltd
 organizationalUnitName          = Organizational Unit Name
-commonName                      = $cn
+commonName                      = ElectricStone SUB CA
 emailAddress                    = Email Address
 countryName_default  = BR
 stateOrProvinceName_default = Brazil
 0.organizationName_default = ElectricStone Ltd
-
-[ v3_ca ]
-# Extensions to apply when createing root ca
-# Extensions for a typical CA, man x509v3_config
-subjectKeyIdentifier  = hash
-authorityKeyIdentifier  = keyid:always,issuer
-basicConstraints  = critical, CA:true
-keyUsage   =  critical, digitalSignature, cRLSign, keyCertSign
 
 [ v3_intermediate_ca ]
 # Extensions to apply when creating intermediate or sub-ca
@@ -212,7 +176,7 @@ authorityKeyIdentifier  = keyid:always,issuer
 #pathlen:0 ensures no more sub-ca can be created below an intermediate
 basicConstraints  = critical, CA:true, pathlen:0
 keyUsage   = critical, digitalSignature, cRLSign, keyCertSign
-crlDistributionPoints = URI:http://localhost:5002/crl/server.crl
+crlDistributionPoints = URI:http://localhost:5002/crl/server.crl # SPECIFIC TO EACH DOMAIN
 
 [ server_cert ]
 # Extensions for server certificates
