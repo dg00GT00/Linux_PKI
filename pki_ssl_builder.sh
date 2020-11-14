@@ -233,11 +233,15 @@ openssl req -config $root_ca_config_path -passin file:$pass \
 
 printf "\n\nCREATING A SUB-CA SIGNING REQUEST... (WARNING: Fullfil the 'CommonName' field even though it already have a default value) \n\n"
 
-openssl req -config $sub_ca_config_path -passin file:$pass -new -key $ca_dir/sub-ca/private/sub-ca.key -sha256 -out $ca_dir/sub-ca/csr/sub-ca.csr
+openssl req -config $sub_ca_config_path -passin file:$pass \
+-new -key $ca_dir/sub-ca/private/sub-ca.key \
+-sha256 -out $ca_dir/sub-ca/csr/sub-ca.csr
 
 printf "\n\nCREATING A SUB-CA CERTIFICATE...\n\n"
 
-openssl ca -config $root_ca_config_path -passin file:$pass -extensions v3_intermediate_ca -days 3650 -notext -in $ca_dir/sub-ca/csr/sub-ca.csr \
+openssl ca -config $root_ca_config_path -passin file:$pass \
+-extensions v3_intermediate_ca -days 3650 -notext \
+-in $ca_dir/sub-ca/csr/sub-ca.csr \
 -out $ca_dir/sub-ca/certs/sub-ca.crt
 
 # Server certificates
@@ -262,4 +266,6 @@ printf "\n\nCREATING SERVER CRL...\n\n"
 openssl ca -passin file:$pass -config $sub_ca_config_path -gencrl -out $ca_dir/server/crl/server.crl -crlexts crl_ext
 
 # Testing the server certificate
-sudo openssl s_server -accept 443 -www -key $ca_dir/server/private/server.key -cert $ca_dir/server/certs/server.crt -CAfile $ca_dir/sub-ca/certs/sub-ca.crt
+sudo openssl s_server -accept 443 -www -key $ca_dir/server/private/server.key \
+-cert $ca_dir/server/certs/server.crt \
+-CAfile $ca_dir/sub-ca/certs/sub-ca.crt
