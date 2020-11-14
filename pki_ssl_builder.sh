@@ -227,7 +227,8 @@ openssl genrsa -out $ca_dir/server/private/server.key 2048
 
 printf "\n\nCREATING THE CA CERTIFICATE... (WARNING: Fullfil the 'CommonName' field even though it already have a default value)\n\n"
 
-openssl req -config $root_ca_config_path -passin file:$pass -key $ca_dir/root-ca/private/ca.key -new -x509 -days 7500 \
+openssl req -config $root_ca_config_path -passin file:$pass \
+-key $ca_dir/root-ca/private/ca.key -new -x509 -days 7500 \
 -sha256 -extensions v3_ca -out $ca_dir/root-ca/certs/ca.crt
 
 printf "\n\nCREATING A SUB-CA SIGNING REQUEST... (WARNING: Fullfil the 'CommonName' field even though it already have a default value) \n\n"
