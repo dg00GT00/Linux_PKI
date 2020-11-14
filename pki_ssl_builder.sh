@@ -9,16 +9,20 @@ The Intermediate CA can be online but often not on the samesystem as other serve
 
 END_OF_DOCS
 
-ca_dir=$HOME/CA
-cn="ElectricStone CA" # Fictional CommonName
+export ca_dir=$HOME/CA
 
 printf "CREATED PKI DIRECTORIES\n\n"
 
-mkdir -p $ca_dir/{root-ca,sub-ca,server}/{private,certs,newcerts,crl,csr}
-mkdir $ca_dir/ca-chain
+mkdir -p $ca_dir/{root-ca,sub-ca,server}/{private,certs,newcerts,crl,csr} $ca_dir/ca-chain $ca_dir/pass
 
-root_ca_config_path=$ca_dir/root-ca/root-ca.conf
-sub_ca_config_path=$ca_dir/sub-ca/sub-ca.conf
+export root_ca_config_path=$ca_dir/root-ca/root-ca.conf
+export sub_ca_config_path=$ca_dir/sub-ca/sub-ca.conf
+
+pass=$ca_dir/pass/pass.aes256
+
+printf "ENTER A PASSWORD FOR PRIVATE KEY GENERATION\n\n"
+
+echo -e $1 | openssl enc -aes256 -pbkdf2 -salt -out $ca_dir/pass/pass.aes256    
 
 cat << EOF > $root_ca_config_path
 [ ca ]
