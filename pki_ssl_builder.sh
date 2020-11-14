@@ -239,12 +239,6 @@ printf "\n\nCREATING A SUB-CA CERTIFICATE...\n\n"
 openssl ca -config $root_ca_config_path -passin file:$pass -extensions v3_intermediate_ca -days 3650 -notext -in $ca_dir/sub-ca/csr/sub-ca.csr \
 -out $ca_dir/sub-ca/certs/sub-ca.crt
 
-# Chained certificates
-
-printf "\n\nCREATING A CERTIFICATE CHAIN...\n\n"
-
-cat $ca_dir/sub-ca/certs/sub-ca.crt $ca_dir/root-ca/certs/ca.crt > $ca_dir/ca-chain/ca-chain.crt
-
 # Server certificates
 
 printf "\n\nCREATING SERVER SIGNING REQUEST...(WARNING: Common Name field is required) \n\n"
@@ -255,6 +249,12 @@ printf "\n\nCREATING SERVER CERTIFICATE SIGNED BY SUB-CA...\n\n"
 
 openssl ca -passin file:$pass -config $sub_ca_config_path -extensions server_cert -days 365 -notext -in $ca_dir/server/csr/server.csr \
 -out $ca_dir/server/certs/server.crt
+
+# Chained certificates
+
+printf "\n\nCREATING A CERTIFICATE CHAIN...\n\n"
+
+cat $ca_dir/sub-ca/certs/sub-ca.crt $ca_dir/root-ca/certs/ca.crt > $ca_dir/ca-chain/ca-chain.crt
 
 printf "\n\nCREATING SERVER CRL...\n\n"
 
