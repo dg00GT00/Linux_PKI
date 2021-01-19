@@ -44,7 +44,7 @@ stateOrProvinceName             = State or Province Name
 localityName                    = Locality Name
 0.organizationName              = ElectricStone Ltd
 organizationalUnitName          = FakeProvider
-commonName                      = ElectricStone SUB CA
+commonName                      = ElectricStone Sub CA
 emailAddress                    = Email Address
 countryName_default  = BR
 stateOrProvinceName_default = Brazil
@@ -74,7 +74,7 @@ stateOrProvinceName             = State or Province Name
 localityName                    = Locality Name
 0.organizationName              = ElectricStone Ltd
 organizationalUnitName          = eCommerce
-commonName                      = ElectricStone SUB CA
+commonName                      = ElectricStone Sub CA
 emailAddress                    = Email Address
 countryName_default  = BR
 stateOrProvinceName_default = Brazil
@@ -122,6 +122,12 @@ openssl x509 -req -in $ca_dir/client/csr/netwebappclient.csr -passin file:$pass 
 -CAserial $ca_dir/ca-chain/ca-chain.srl \
 -out $ca_dir/client/certs/netwebappclient.crt -days 365 -sha256 -extfile $client_config_path
 
+openssl pkcs12 -export -out $ca_dir/server/certs/netwebapp.pfx \
+-in $ca_dir/server/certs/netwebapp.crt \
+-inkey $ca_dir/server/private/netwebapp.key \
+-CAfile $ca_dir/root-ca/certs/ca.crt \
+-certfile $ca_dir/sub-ca/certs/sub-ca.crt
+
 # Testing the server certificate
 
 sudo openssl s_server -accept 443 -www -key $ca_dir/server/private/netwebapp.key \
@@ -130,15 +136,9 @@ sudo openssl s_server -accept 443 -www -key $ca_dir/server/private/netwebapp.key
 
 # Testing the client certificate
 
-openssl s_client -connect localhost:443 -servername localhost \
--CAfile $ca_dir/root-ca/certs/ca.crt \
--showcerts
-
-# openssl pkcs12 -export -out $ca_dir/server/certs/netwebapp.pfx \
-# -in $ca_dir/server/certs/netwebapp.crt \
-# -inkey $ca_dir/server/private/netwebapp.key
+# openssl s_client -connect localhost:443 -servername localhost \
 # -CAfile $ca_dir/root-ca/certs/ca.crt \
-# -certfile $ca_dir/sub-ca/certs/sub-ca.crt \
+# -showcerts
 
 # openssl pkcs12 -export -in $ca_dir/server/certs/netwebapp.crt \
 # -inkey $ca_dir/server/private/netwebapp.key \

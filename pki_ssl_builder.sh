@@ -162,7 +162,7 @@ stateOrProvinceName             = State or Province Name
 localityName                    = Locality Name
 0.organizationName              = ElectricStone Ltd
 organizationalUnitName          = Organizational Unit Name
-commonName                      = ElectricStone SUB CA
+commonName                      = ElectricStone Sub CA
 emailAddress                    = Email Address
 countryName_default  = BR
 stateOrProvinceName_default = Brazil
@@ -217,7 +217,7 @@ printf "CREATING THE CA PRIVATE KEY - PASS-PHRASE NEEDED...\n\n"
 
 openssl genrsa -aes256 -passout file:$pass -out $ca_dir/root-ca/private/ca.key 4096 
 
-printf "\n\nCREATING THE SUB-CA PRIVATE KEY - PASS-PHRASE NEEDED...\n\n"
+printf "\n\nCREATING THE Sub-CA PRIVATE KEY - PASS-PHRASE NEEDED...\n\n"
 
 openssl genrsa -aes256 -passout file:$pass -out $ca_dir/sub-ca/private/sub-ca.key 4096
 
@@ -231,13 +231,13 @@ openssl req -config $root_ca_config_path -passin file:$pass \
 -key $ca_dir/root-ca/private/ca.key -new -x509 -days 7500 \
 -sha256 -extensions v3_ca -out $ca_dir/root-ca/certs/ca.crt
 
-printf "\n\nCREATING A SUB-CA SIGNING REQUEST... (WARNING: Fullfil the 'CommonName' field even though it already have a default value) \n\n"
+printf "\n\nCREATING A Sub-CA SIGNING REQUEST... (WARNING: Fullfil the 'CommonName' field even though it already have a default value) \n\n"
 
 openssl req -config $sub_ca_config_path -passin file:$pass \
 -new -key $ca_dir/sub-ca/private/sub-ca.key \
 -sha256 -out $ca_dir/sub-ca/csr/sub-ca.csr
 
-printf "\n\nCREATING A SUB-CA CERTIFICATE...\n\n"
+printf "\n\nCREATING A Sub-CA CERTIFICATE...\n\n"
 
 openssl ca -config $root_ca_config_path -passin file:$pass \
 -extensions v3_intermediate_ca -days 3650 -notext \
@@ -250,7 +250,7 @@ printf "\n\nCREATING SERVER SIGNING REQUEST...(WARNING: Common Name field is req
 
 openssl req -passin file:$pass -key $ca_dir/server/private/server.key -new -sha256 -out $ca_dir/server/csr/server.csr
 
-printf "\n\nCREATING SERVER CERTIFICATE SIGNED BY SUB-CA...\n\n"
+printf "\n\nCREATING SERVER CERTIFICATE SIGNED BY Sub-CA...\n\n"
 
 openssl ca -passin file:$pass -config $sub_ca_config_path -extensions server_cert -days 365 -notext -in $ca_dir/server/csr/server.csr \
 -out $ca_dir/server/certs/server.crt
@@ -266,6 +266,6 @@ printf "\n\nCREATING SERVER CRL...\n\n"
 openssl ca -passin file:$pass -config $sub_ca_config_path -gencrl -out $ca_dir/server/crl/server.crl -crlexts crl_ext
 
 # Testing the server certificate
-sudo openssl s_server -accept 443 -www -key $ca_dir/server/private/server.key \
--cert $ca_dir/server/certs/server.crt \
--CAfile $ca_dir/sub-ca/certs/sub-ca.crt
+# sudo openssl s_server -accept 443 -www -key $ca_dir/server/private/server.key \
+# -cert $ca_dir/server/certs/server.crt \
+# -CAfile $ca_dir/sub-ca/certs/sub-ca.crt
